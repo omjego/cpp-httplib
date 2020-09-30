@@ -31,5 +31,6 @@ cert.pem:
 	openssl req -new -batch -config test.conf -key client.key.pem | openssl x509 -days 370 -req -CA rootCA.cert.pem -CAkey rootCA.key.pem -CAcreateserial > client.cert.pem
 	#c_rehash .
 
+gen-fuzz: fuzzing/request_fuzzer.cc ../httplib.h
 clean:
 	rm -f test test_proxy pem *.0 *.1 *.srl
