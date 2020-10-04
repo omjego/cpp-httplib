@@ -33,7 +33,7 @@ cert.pem:
 
 # TODO Add rule for dummy local fuzzer.
 gen-fuzzers: fuzzing/server_fuzzer.cc ../httplib.h
-  $(CXX) -o server_fuzzer $(CXXFLAGS) $<  $(LIB_FUZZING_ENGINE) $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT) $(BROTLI_SUPPORT) -pthread
+	$(CXX) -o server_fuzzer $(CXXFLAGS) $<  $(LIB_FUZZING_ENGINE) $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT) $(BROTLI_SUPPORT) -pthread
 
 clean:
 	rm -f test test_proxy pem *.0 *.1 *.srl
