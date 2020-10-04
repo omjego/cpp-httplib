@@ -51,31 +51,30 @@ class FuzzableServer : public httplib::Server {
   }
 };
 
-static std::unique_ptr<FuzzableServer> g_server;
+static FuzzableServer g_server;
 
 extern "C" int LLVMFuzzerInitialize(int* argc, char*** argv) {
-  g_server = std::make_unique<FuzzableServer>();
-  g_server->Get(R"(.*)",
+  g_server.Get(R"(.*)",
                 [&](const httplib::Request& req, httplib::Response& res) {
                   res.set_content("response content", "text/plain");
                 });
-  g_server->Post(R"(.*)",
+  g_server.Post(R"(.*)",
                  [&](const httplib::Request& req, httplib::Response& res) {
                    res.set_content("response content", "text/plain");
                  });
-  g_server->Put(R"(.*)",
+  g_server.Put(R"(.*)",
                 [&](const httplib::Request& req, httplib::Response& res) {
                   res.set_content("response content", "text/plain");
                 });
-  g_server->Patch(R"(.*)",
+  g_server.Patch(R"(.*)",
                   [&](const httplib::Request& req, httplib::Response& res) {
                     res.set_content("response content", "text/plain");
                   });
-  g_server->Delete(R"(.*)",
+  g_server.Delete(R"(.*)",
                    [&](const httplib::Request& req, httplib::Response& res) {
                      res.set_content("response content", "text/plain");
                    });
-  g_server->Options(R"(.*)",
+  g_server.Options(R"(.*)",
                     [&](const httplib::Request& req, httplib::Response& res) {
                       res.set_content("response content", "text/plain");
                     });
@@ -84,6 +83,6 @@ extern "C" int LLVMFuzzerInitialize(int* argc, char*** argv) {
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   FuzzedStream stream{data, size};
-  g_server->ProcessFuzzedRequest(stream);
+  g_server.ProcessFuzzedRequest(stream);
   return 0;
 }
