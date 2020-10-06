@@ -20,7 +20,7 @@ test : test.cc ../httplib.h Makefile cert.pem
 	$(CXX) -o test $(CXXFLAGS) test.cc gtest/gtest-all.cc gtest/gtest_main.cc $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT) $(BROTLI_SUPPORT) -pthread
 
 test_proxy : test_proxy.cc ../httplib.h Makefile cert.pem
-	$(CXX) -o test_proxy $(CXXFLAGS) test_proxy.cc gtest/gtest-all.cc gtest/gtest_main.cc $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT) $(BROTLI_SUPPORT) -pthread
+	$(CXX) -o test_proxy $(CXXFLAGS) test_proxy.cc gtest/gtest-all.cc gtest/gtest_main.cc $(OPENSSL_SUPPORT) -lz -ldl -static-libgcc $(ZLIB_SUPPORT) $(BROTLI_SUPPORT) -pthread
 
 cert.pem:
 	openssl genrsa 2048 > key.pem
@@ -34,7 +34,7 @@ cert.pem:
 # TODO Add rule for dummy local fuzzer.
 # $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT) $(BROTLI_SUPPORT)
 gen-fuzzers: fuzzing/server_fuzzer.cc ../httplib.h
-	$(CXX) -o server_fuzzer $(CXXFLAGS) $<  $(LIB_FUZZING_ENGINE)  -pthread
+	$(CXX) -o server_fuzzer $(CXXFLAGS) $<  $(OPENSSL_SUPPORT) -lz -ldl -static-libgcc  $(LIB_FUZZING_ENGINE)  $(ZLIB_SUPPORT) $(BROTLI_SUPPORT)  -pthread
 
 clean:
 	rm -f test test_proxy pem *.0 *.1 *.srl
