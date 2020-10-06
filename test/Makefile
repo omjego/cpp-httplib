@@ -34,10 +34,10 @@ cert.pem:
 # TODO Add rule for dummy local fuzzer.
 # $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT) $(BROTLI_SUPPORT)
 gen-fuzzers: fuzzing/server_fuzzer.cc ../httplib.h
-	$(CXX) -o server_fuzzer $(CXXFLAGS) $<  fuzzing/server_fuzzer.cc -Wl,-Bstatic $(OPENSSL_SUPPORT)  $(ZLIB_SUPPORT)  -Wl,-Bdynamic -ldl $(BROTLI_SUPPORT) -$(LIB_FUZZING_ENGINE) pthread -pthread
+	$(CXX) -o server_fuzzer $(CXXFLAGS) $<  fuzzing/server_fuzzer.cc -Wl,-Bstatic $(OPENSSL_SUPPORT)  $(ZLIB_SUPPORT)  -Wl,-Bdynamic -ldl $(BROTLI_SUPPORT) -$(LIB_FUZZING_ENGINE)  -pthread
 
 fuzz-local: fuzzing/standalone_fuzz_target_runner.cpp fuzzing/server_fuzzer.cc  ../httplib.h
-	$(CXX) -o server_fuzzer $(CXXFLAGS) $< s fuzzing/server_fuzzer.cc -Wl,-Bstatic $(OPENSSL_SUPPORT)  $(ZLIB_SUPPORT)  -Wl,-Bdynamic -ldl $(BROTLI_SUPPORT) -pthread -pthread
+	$(CXX) -o server_fuzzer $(CXXFLAGS) $< s fuzzing/server_fuzzer.cc -Wl,-Bstatic $(OPENSSL_SUPPORT)  $(ZLIB_SUPPORT)  -Wl,-Bdynamic -ldl $(BROTLI_SUPPORT) -pthread
 
 clean:
 	rm -f test test_proxy pem *.0 *.1 *.srl
