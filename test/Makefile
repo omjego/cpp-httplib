@@ -10,6 +10,7 @@ ZLIB_SUPPORT = -DCPPHTTPLIB_ZLIB_SUPPORT -lz
 BROTLI_DIR = /usr/local/opt/brotli
 BROTLI_SUPPORT = -DCPPHTTPLIB_BROTLI_SUPPORT -I$(BROTLI_DIR)/include -L$(BROTLI_DIR)/lib -lbrotlicommon -lbrotlienc -lbrotlidec
 
+LIB_FUZZING_ENGINE ?= standalone_fuzz_target_runner.o
 all : test
 	./test
 
@@ -31,13 +32,15 @@ cert.pem:
 	openssl req -new -batch -config test.conf -key client.key.pem | openssl x509 -days 370 -req -CA rootCA.cert.pem -CAkey rootCA.key.pem -CAcreateserial > client.cert.pem
 	#c_rehash .
 
-# TODO Add rule for dummy local fuzzer.
-# $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT) $(BROTLI_SUPPORT)
-gen-fuzzers: fuzzing/server_fuzzer.cc ../httplib.h
-	$(CXX) -o server_fuzzer $(CXXFLAGS) $<  fuzzing/server_fuzzer.cc $(LIB_FUZZING_ENGINE) -Wl,-Bstatic $(OPENSSL_SUPPORT)  $(ZLIB_SUPPORT)  -Wl,-Bdynamic -ldl $(BROTLI_SUPPORT)  -pthread
+fuzz_test: server_fuzzer
+	./server_fuzzer fuzzing/corpus/*
 
-fuzz-local: fuzzing/standalone_fuzz_target_runner.cpp fuzzing/server_fuzzer.cc  ../httplib.h
-	$(CXX) -o server_fuzzer $(CXXFLAGS) $<  fuzzing/server_fuzzer.cc -Wl,-Bstatic $(OPENSSL_SUPPORT)  $(ZLIB_SUPPORT)  -Wl,-Bdynamic -ldl $(BROTLI_SUPPORT) -pthread
+# -Wl,-Bstatic $(OPENSSL_SUPPORT)   -Wl,-Bdynamic -ldl  $(ZLIB_SUPPORT)  $(BROTLI_SUPPORT)
+server_fuzzer : fuzzing/server_fuzzer.cc ../httplib.h standalone_fuzz_target_runner.o
+	$(CXX) $(CXXFLAGS) -o $@  $<   $(LIB_FUZZING_ENGINE) -pthread
+
+standalone_fuzz_target_runner.o : fuzzing/standalone_fuzz_target_runner.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 clean:
-	rm -f test test_proxy pem *.0 *.1 *.srl
+	rm -f test test_proxy server_fuzzer pem *.0 *.o *.1 *.srl
