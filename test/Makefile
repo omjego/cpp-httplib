@@ -37,7 +37,7 @@ fuzz_test: server_fuzzer
 
 # -Wl,-Bstatic $(OPENSSL_SUPPORT)   -Wl,-Bdynamic -ldl  $(ZLIB_SUPPORT)  $(BROTLI_SUPPORT)
 server_fuzzer : fuzzing/server_fuzzer.cc ../httplib.h standalone_fuzz_target_runner.o
-	$(CXX) $(CXXFLAGS) -o $@  $<   $(LIB_FUZZING_ENGINE) -pthread
+	$(CXX) $(CXXFLAGS) -o $@  $< -Wl,-Bstatic $(OPENSSL_SUPPORT)   -Wl,-Bdynamic -ldl  $(ZLIB_SUPPORT)  $(BROTLI_SUPPORT) $(LIB_FUZZING_ENGINE) -pthread
 
 standalone_fuzz_target_runner.o : fuzzing/standalone_fuzz_target_runner.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
