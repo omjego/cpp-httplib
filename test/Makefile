@@ -9,6 +9,7 @@ ZLIB_SUPPORT = -DCPPHTTPLIB_ZLIB_SUPPORT -lz
 
 BROTLI_DIR = /usr/local/opt/brotli
 BROTLI_SUPPORT = -DCPPHTTPLIB_BROTLI_SUPPORT -I$(BROTLI_DIR)/include -L$(BROTLI_DIR)/lib -lbrotlicommon -lbrotlienc -lbrotlidec
+# BROTLI_STATIC_SUPPORT = -DCPPHTTPLIB_BROTLI_SUPPORT -I$(BROTLI_DIR)/include -L$(BROTLI_DIR)/lib -l:libbrotlicommon.a -l:libbrotlienc.a -l:libbrotlidec.a
 
 LIB_FUZZING_ENGINE ?= standalone_fuzz_target_runner.o
 all : test
@@ -36,11 +37,13 @@ fuzz_test: server_fuzzer
 	./server_fuzzer fuzzing/corpus/*
 
 # -Wl,-Bstatic $(OPENSSL_SUPPORT)   -Wl,-Bdynamic -ldl  $(ZLIB_SUPPORT)  $(BROTLI_SUPPORT)
+# $(BROTLI_STATIC_SUPPORT)
 server_fuzzer : fuzzing/server_fuzzer.cc ../httplib.h standalone_fuzz_target_runner.o
-	$(CXX) $(CXXFLAGS) -o $@  $< -Wl,-Bstatic $(OPENSSL_SUPPORT) $(BROTLI_SUPPORT)  -Wl,-Bdynamic -ldl  $(ZLIB_SUPPORT)  $(LIB_FUZZING_ENGINE) -pthread
+	$(CXX) $(CXXFLAGS) -o $@  $< -Wl,-Bstatic $(OPENSSL_SUPPORT)  -Wl,-Bdynamic -ldl  $(ZLIB_SUPPORT)  $(LIB_FUZZING_ENGINE) -pthread
+	zip -q -r server_fuzzer_seed_corpus.zip fuzzing/corpus
 
 standalone_fuzz_target_runner.o : fuzzing/standalone_fuzz_target_runner.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 clean:
-	rm -f test test_proxy server_fuzzer pem *.0 *.o *.1 *.srl
+	rm -f test test_proxy server_fuzzer pem *.0 *.o *.1 *.srl *.zip
