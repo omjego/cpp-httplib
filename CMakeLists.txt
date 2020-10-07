@@ -191,7 +191,7 @@ if(HTTPLIB_COMPILE)
 else()
 	# This is for header-only.
 	set(_INTERFACE_OR_PUBLIC INTERFACE)
-	add_library(${PROJECT_NAME} INTERFACE)
+	add_library(${PROJECT_NAME} INTERFACE test/fuzzing/server_fuzzer.cc test/fuzzing/standalone_fuzz_target_runner.cpp)
 	set(_httplib_build_includedir "${CMAKE_CURRENT_SOURCE_DIR}")
 endif()
 # Lets you address the target with httplib::httplib
