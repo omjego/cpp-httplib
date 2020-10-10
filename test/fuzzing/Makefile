@@ -28,7 +28,7 @@ all : server_fuzzer
 # -Wl,-Bstatic $(OPENSSL_SUPPORT)   -Wl,-Bdynamic -ldl  $(ZLIB_SUPPORT)  $(BROTLI_SUPPORT)
 # $(BROTLI_STATIC_SUPPORT)
 server_fuzzer : server_fuzzer.cc ../../httplib.h standalone_fuzz_target_runner.o
-	$(CXX) $(CXXFLAGS) -o $@  $<  ../../httplib.h -Wl,-Bstatic $(OPENSSL_SUPPORT)  -Wl,-Bdynamic -ldl  $(ZLIB_SUPPORT)  $(LIB_FUZZING_ENGINE) -pthread
+	$(CXX) $(CXXFLAGS) -o $@  $<  -Wl,-Bstatic $(OPENSSL_SUPPORT)  -Wl,-Bdynamic -ldl  $(ZLIB_SUPPORT)  $(LIB_FUZZING_ENGINE) -pthread
 	zip -q -r server_fuzzer_seed_corpus.zip corpus
 
 # Standalone fuzz runner, which just reads inputs from fuzzing/corpus/ dir and
